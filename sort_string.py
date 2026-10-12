@@ -1,37 +1,28 @@
 #!/usr/bin/env python3
-"""Sort an input string in alphabetical order.
+"""Sort the characters of an input string in alphabetical order.
 
-By default the characters of the string are sorted (case-insensitive).
-Use --words to sort whitespace-separated words instead.
-
-Examples:
-    python sort_string.py "hello world"          -> " dehllloorw"
-    python sort_string.py --words "pear Apple fig" -> "Apple fig pear"
-    echo "banana" | python sort_string.py          -> "aaabnn"
+Usage:
+    python sort_string.py "hello world"
+    echo "hello world" | python sort_string.py
 """
-
-import argparse
 import sys
 
 
-def sort_chars(text: str) -> str:
-    """Return the characters of text sorted alphabetically (case-insensitive)."""
-    return "".join(sorted(text, key=lambda c: (c.lower(), c)))
-
-
-def sort_words(text: str) -> str:
-    """Return the words of text sorted alphabetically (case-insensitive)."""
-    return " ".join(sorted(text.split(), key=lambda w: (w.lower(), w)))
+def sort_string(text: str, ignore_case: bool = True) -> str:
+    """Return the characters of `text` sorted alphabetically (whitespace removed)."""
+    chars = [c for c in text if not c.isspace()]
+    key = str.lower if ignore_case else None
+    return "".join(sorted(chars, key=key))
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Sort a string in alphabetical order.")
-    parser.add_argument("text", nargs="?", help="String to sort (reads stdin if omitted)")
-    parser.add_argument("-w", "--words", action="store_true", help="Sort words instead of characters")
-    args = parser.parse_args()
-
-    text = args.text if args.text is not None else sys.stdin.read().rstrip("\n")
-    print(sort_words(text) if args.words else sort_chars(text))
+    if len(sys.argv) > 1:
+        text = " ".join(sys.argv[1:])
+    elif not sys.stdin.isatty():
+        text = sys.stdin.read()
+    else:
+        text = input("Enter a string: ")
+    print(sort_string(text))
 
 
 if __name__ == "__main__":
